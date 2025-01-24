@@ -18,7 +18,7 @@ public class HouseOwner extends ClassMAPTable {
    public HouseOwner() {
        super.setNomTable("house_owner");
    }
-
+   
    public HouseOwner(String id, String name, String phone) {
        this.id = id;
        this.name = name;
