@@ -210,3 +210,55 @@ UPDATE house SET id_house_owner = 9 WHERE id = 9;
 UPDATE house SET id_house_owner = 10 WHERE id = 10;
 UPDATE house SET id_house_owner = 11 WHERE id = 11;
 UPDATE house SET id_house_owner = 12 WHERE id = 12;
+
+/*================================================================== */
+/*================================================================== */
+/*================================================================== */
+
+-- Facture pour la maison 1
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (1, 160000, 2023, 10, 100, 1.2, 1);
+
+-- Facture pour la maison 2
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (2, 13500, 2023, 10, 100, 1.1, 2);
+
+-- Facture pour la maison 3
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (3, 1260000, 2023, 10, 100, 1.3, 3);
+
+-- Facture pour la maison 4
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (4, 45000, 2023, 10, 100, 1.0, 4);
+
+-- Facture pour la maison 5
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (5, 280800, 2023, 10, 100, 1.2, 5);
+
+-- Facture pour la maison 6
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (6, 507600, 2023, 10, 100, 1.1, 6);
+
+-- Facture pour la maison 7
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (7, 22000, 2023, 10, 100, 1.0, 7);
+
+-- Facture pour la maison 8
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (8, 252000, 2023, 10, 100, 1.2, 8);
+
+-- Facture pour la maison 9
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (9, 600000, 2023, 10, 100, 1.3, 9);
+
+-- Facture pour la maison 10
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (10, 300000, 2023, 10, 100, 1.1, 10);
+
+-- Facture pour la maison 11
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (11, 78000, 2023, 10, 100, 1.0, 11);
+
+-- Facture pour la maison 12
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (12, 102200, 2023, 10, 100, 1.2, 12);

@@ -5,6 +5,9 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 import bean.ClassMAPTable;
 
@@ -113,6 +116,37 @@ public class House extends ClassMAPTable {
         }
     
         return commune;
+    }
+
+     public List<Facture> getFactureByMonthYear(Connection connection, int year, int month) {
+        List<Facture> factures = new ArrayList<>();
+        String query = "SELECT * FROM house_invoice_simple WHERE house_id = ? AND year = ? AND month = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId()); 
+            preparedStatement.setInt(2, year); 
+            preparedStatement.setInt(3, month); 
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Facture facture = new Facture(
+                        resultSet.getString("facture_id"),
+                        resultSet.getDouble("total_surface"),
+                        resultSet.getInt("year"),
+                        resultSet.getInt("month"),
+                        resultSet.getDouble("unit_price"),
+                        resultSet.getDouble("coefficient"),
+                        resultSet.getString("house_id")
+                    );
+                    factures.add(facture);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la récupération des factures.", e);
+        }
+
+        return factures;
     }
 
     @Override
