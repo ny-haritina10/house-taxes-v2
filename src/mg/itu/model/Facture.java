@@ -4,7 +4,10 @@ import bean.ClassMAPTable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Facture extends ClassMAPTable {
 
@@ -63,6 +66,40 @@ public class Facture extends ClassMAPTable {
         }
     }
 
+    /**
+     * Retrieves all Facture records from the database.
+     *
+     * @param con The database connection.
+     * @return A list of Facture objects.
+     * @throws SQLException If a database access error occurs.
+     */
+    public static List<Facture> getAll(Connection con) throws SQLException {
+        List<Facture> factures = new ArrayList<>();
+        String query = "SELECT * FROM facture";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Facture facture = new Facture(
+                    resultSet.getString("id"),
+                    resultSet.getDouble("totalSurface"),
+                    resultSet.getInt("year"),
+                    resultSet.getInt("month"),
+                    resultSet.getDouble("unit_price"),
+                    resultSet.getDouble("coefficient"),
+                    resultSet.getString("id_house")
+                );
+                factures.add(facture);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error retrieving factures from the database.", e);
+        }
+
+        return factures;
+    }
+
     @Override
     public String[] getMotCles() {
         String[] motCles = {"id", "totalSurface", "year", "month", 
@@ -78,6 +115,19 @@ public class Facture extends ClassMAPTable {
     @Override
     public String getTuppleID() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Facture{" +
+                "id='" + id + '\'' +
+                ", totalSurface=" + totalSurface +
+                ", year=" + year +
+                ", month=" + month +
+                ", unitPrice=" + unitPrice +
+                ", coefficient=" + coefficient +
+                ", idHouse='" + idHouse + '\'' +
+                '}';
     }
 
     // Getters and Setters
