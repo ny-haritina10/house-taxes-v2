@@ -1,6 +1,6 @@
 @echo off
 
-set WILDFLY_HOME=D:\Executable\wildfly-26.1.2.Final
+set WILDFLY_HOME=D:\executable\wildfly-26.1.2.Final
 
 echo Starting WildFly...
 cd %WILDFLY_HOME%\bin

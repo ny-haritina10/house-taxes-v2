@@ -263,3 +263,17 @@ BEGIN
     END IF;
 END;
 /
+
+CREATE TABLE house_owner(
+   id NUMBER PRIMARY KEY ,
+   name VARCHAR2(50)  NOT NULL,
+   phone VARCHAR2(50)
+);
+
+
+ALTER TABLE house ADD id_house_owner NUMBER;
+
+ALTER TABLE house 
+ADD CONSTRAINT fk_house_owner 
+FOREIGN KEY (id_house_owner) 
+REFERENCES house_owner(id);
