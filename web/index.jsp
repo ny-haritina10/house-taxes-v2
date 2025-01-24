@@ -1,3 +1,3 @@
 <%
-  response.sendRedirect("controller/MainController");
+  response.sendRedirect("controller/TraitementUser");
 %>
