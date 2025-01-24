@@ -59,3 +59,20 @@ FROM
     facture f
 JOIN 
     house h ON f.id_house = h.id;
+
+
+
+CREATE OR REPLACE VIEW house_arrondissement_view AS
+SELECT 
+    h.id AS house_id,
+    h.label AS house_label,
+    a.id AS arrondissement_id,
+    a.label AS arrondissement_label,
+    c.id AS commune_id,
+    c.label AS commune_label
+FROM 
+    house h
+JOIN 
+    arrondissement a ON h.id_arrondissement = a.id
+JOIN 
+    commune c ON a.id_commune = c.id;

@@ -312,12 +312,49 @@ public class House extends ClassMAPTable {
         return factures;
     }
 
+    public Arrondissement getArrondissement(Connection connection) {
+        Arrondissement arrondissement = null;
+        String query = """
+            SELECT 
+                arrondissement_id, 
+                arrondissement_label, 
+                commune_id 
+            FROM 
+                house_arrondissement_view 
+            WHERE 
+                house_id = ?
+        """;
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId()); // ID de la maison
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    arrondissement = new Arrondissement(
+                        resultSet.getString("arrondissement_id"),
+                        resultSet.getString("commune_id"),
+                        resultSet.getString("arrondissement_label")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la récupération de l'arrondissement.", e);
+        }
+    
+        return arrondissement;
+    }
+    
+    public HouseOwner getProprietaire(Connection connection) throws Exception{
+        return (HouseOwner) new HouseOwner().getById(this.getIdHouseOwner(), "house_owner", connection);
+    }
+
     @Override
     public String[] getMotCles() {
         String[] motCles = { "id", "id_arrondissement", "label", "width", "height", "nbr_floor", "longitude", "latitude" };
         return motCles;
     }
-
+    
     @Override
     public String getAttributIDName() 
     { return "id"; }
