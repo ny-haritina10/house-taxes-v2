@@ -43,3 +43,19 @@ FROM
     house_owner ho
 LEFT JOIN 
     house h ON ho.id = h.id_house_owner;
+
+
+CREATE OR REPLACE VIEW house_invoice_simple AS
+SELECT 
+    f.id AS facture_id,
+    h.id AS house_id,
+    h.label AS house_label,
+    f.totalSurface AS total_surface,
+    f.unit_price AS unit_price,
+    f.coefficient AS coefficient,
+    f.year AS year,
+    f.month AS month
+FROM 
+    facture f
+JOIN 
+    house h ON f.id_house = h.id;
