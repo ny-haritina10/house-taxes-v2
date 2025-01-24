@@ -38,17 +38,20 @@ public class MainController extends HttpServlet {
                 System.out.println("Amount: " + pricePerM2.getAmount());
                 System.out.println("Date: " + pricePerM2.getDatePrice());
 
-                Facture facture = new Facture(
-                    house.calculateSurface(con, 1, 2025), 
-                    2025, 
-                    1, 
-                    pricePerM2.getAmount(), 
-                    1.2, // hard coded
-                    house.getId() 
-                );
+                // Facture facture = new Facture(
+                //     house.calculateSurface(con, 1, 2025), 
+                //     2025, 
+                //     1, 
+                //     pricePerM2.getAmount(), 
+                //     1.2, // hard coded
+                //     house.getId() 
+                // );
 
-                facture.insert(con);
-                System.out.println("Facture inserted for house: " + house.getId());
+                // facture.insert(con);
+                // System.out.println("Facture inserted for house: " + house.getId());
+
+                double totalCoefficient = house.getCoeff(con, 2025, 1);
+                System.out.println("Total coefficient: " + totalCoefficient);
             }
 
             req.getRequestDispatcher("/WEB-INF/views/main.jsp").forward(req, resp);  

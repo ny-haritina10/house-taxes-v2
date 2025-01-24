@@ -39,6 +39,127 @@ public class House extends ClassMAPTable {
         this.latitude = latitude;
     }
 
+    // public double getCoeff(Connection connection, int year, int month) throws Exception {
+    //     double totalCoefficient = 1.0; // Default value if no coefficients are found
+    
+    //     String query = """
+    //         WITH relevant_history AS (
+    //             SELECT 
+    //                 hcm.id_house_composant,
+    //                 hhcm.coefficient,
+    //                 hhcm.changed_at,
+    //                 ROW_NUMBER() OVER (PARTITION BY hcm.id_house_composant ORDER BY hhcm.changed_at DESC) AS rn
+    //             FROM 
+    //                 histo_house_comp_mat hhcm
+    //             JOIN house_composant_material hcm ON hhcm.id_house_composant_material = hcm.id
+    //             JOIN house_caracteristique hc ON hcm.id_house_composant = hc.id_house_composant
+    //             WHERE 
+    //                 hc.id_house = ?
+    //                 AND hhcm.changed_at <= TO_DATE(?, 'YYYY-MM-DD')
+    //         ),
+    //         latest_history AS (
+    //             SELECT 
+    //                 id_house_composant,
+    //                 coefficient
+    //             FROM 
+    //                 relevant_history
+    //             WHERE 
+    //                 rn = 1
+    //         ),
+    //         current_data AS (
+    //             SELECT 
+    //                 hcm.id_house_composant,
+    //                 hcm.coefficient
+    //             FROM 
+    //                 house_composant_material hcm
+    //             JOIN house_caracteristique hc ON hcm.id_house_composant = hc.id_house_composant
+    //             WHERE 
+    //                 hc.id_house = ?
+    //                 AND NOT EXISTS (
+    //                     SELECT 1 
+    //                     FROM histo_house_comp_mat hhcm 
+    //                     WHERE hhcm.id_house_composant_material = hcm.id
+    //                 )
+    //         ),
+    //         combined_data AS (
+    //             SELECT 
+    //                 id_house_composant,
+    //                 coefficient
+    //             FROM 
+    //                 latest_history
+    //             UNION ALL
+    //             SELECT 
+    //                 id_house_composant,
+    //                 coefficient
+    //             FROM 
+    //                 current_data
+    //         ),
+    //         house_total_coefficients AS (
+    //             SELECT 
+    //                 EXP(SUM(LN(coefficient))) AS total_coefficient
+    //             FROM 
+    //                 combined_data
+    //         )
+    //         SELECT COALESCE(htc.total_coefficient, 1.0) AS total_coefficient
+    //         FROM house_total_coefficients htc
+    //     """;
+    
+    //     try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+    //         preparedStatement.setString(1, this.getId()); // House ID
+    //         String targetDate = String.format("%04d-%02d-31", year, month); // Format as YYYY-MM-DD
+    //         preparedStatement.setString(2, targetDate); // Target date for historical lookup
+    //         preparedStatement.setString(3, this.getId()); // House ID for current data lookup
+    
+    //         try (ResultSet resultSet = preparedStatement.executeQuery()) {
+    //             if (resultSet.next()) {
+    //                 totalCoefficient = resultSet.getDouble("total_coefficient");
+    //             }
+    //         }
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //         throw new RuntimeException("Error retrieving total coefficient.", e);
+    //     }
+    
+    //     return totalCoefficient;
+    // }
+
+    public double getCoeff(Connection connection, int year, int month) throws Exception {
+        double totalCoefficient = 1.0; // Default value if no coefficients are found
+    
+        String query = """
+            WITH house_total_coefficients AS (
+                SELECT 
+                    hc.id_house,
+                    EXP(SUM(LN(hcm.coefficient))) AS total_coefficient
+                FROM 
+                    house_caracteristique hc
+                JOIN house_composant_material hcm ON hc.id_house_composant_material = hcm.id
+                WHERE hc.id_house = ?
+                GROUP BY hc.id_house
+            )
+            SELECT COALESCE(htc.total_coefficient, 1.0) AS total_coefficient
+            FROM house_total_coefficients htc
+            RIGHT JOIN house h ON h.id = htc.id_house
+            WHERE h.id = ?
+        """;
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId()); 
+            preparedStatement.setString(2, this.getId()); 
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    totalCoefficient = resultSet.getDouble("total_coefficient");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving total coefficient.", e);
+        }
+    
+        return totalCoefficient;
+    }
+
     public PricePerM2 getPricePerM2(Connection connection, int year, int month) throws Exception {
         double amount = 0.0;
         Date datePrice = null;
