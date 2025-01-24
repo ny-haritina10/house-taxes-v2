@@ -1,0 +1,50 @@
+package mg.itu.controller;
+
+import java.io.IOException;
+import java.sql.Connection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import bean.CGenUtil;
+import mg.itu.database.Database;
+import mg.itu.model.House;
+
+@WebServlet("controller/MainController")
+public class MainController extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+        throws ServletException, IOException 
+    {   
+        try (Connection con = Database.getConnection()) {
+            House[] houses = (House[]) CGenUtil.rechercher(
+                new House(),
+                null,
+                null,
+                con,
+                ""
+            );
+
+            for (House house : houses) {
+                System.out.println("h-" + house.getId() + " = " +house.calculateSurface(con, null, null));
+            }
+
+            req.getRequestDispatcher("/WEB-INF/views/main.jsp").forward(req, resp);  
+        } 
+        
+        catch (Exception e) {
+            e.printStackTrace();
+        }  
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+        throws ServletException, IOException 
+    {
+        
+    }
+}
