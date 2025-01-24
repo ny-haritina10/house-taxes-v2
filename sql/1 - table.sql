@@ -263,3 +263,41 @@ BEGIN
     END IF;
 END;
 /
+
+CREATE TABLE house_owner(
+   id NUMBER PRIMARY KEY ,
+   name VARCHAR2(50)  NOT NULL,
+   phone VARCHAR2(50)
+);
+
+
+ALTER TABLE house ADD id_house_owner NUMBER;
+
+ALTER TABLE house 
+ADD CONSTRAINT fk_house_owner 
+FOREIGN KEY (id_house_owner) 
+REFERENCES house_owner(id);
+
+
+CREATE TABLE facture(
+   id NUMBER PRIMARY KEY ,
+   totalSurface NUMBER(15,2)  ,
+   year NUMBER(10),
+   month NUMBER(10),
+   unit_price NUMBER(15,2)  ,
+   coefficient NUMBER(15,2)  ,
+   id_house NUMBER  NOT NULL,
+   FOREIGN KEY(id_house) REFERENCES house(id)
+);
+
+CREATE SEQUENCE facture_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER trg_facture_id
+BEFORE INSERT ON facture
+FOR EACH ROW
+BEGIN
+    IF :NEW.id IS NULL THEN
+        :NEW.id := facture_seq.NEXTVAL;
+    END IF;
+END;
+/

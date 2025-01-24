@@ -184,3 +184,29 @@ INSERT INTO house_caracteristique (id, id_house, id_house_composant_material)
 VALUES (23, 12, 2);
 INSERT INTO house_caracteristique (id, id_house, id_house_composant_material)
 VALUES (24, 12, 6);
+
+INSERT INTO house_owner (id, name, phone) VALUES (1, 'Jean Dupont', '0601020304');
+INSERT INTO house_owner (id, name, phone) VALUES (2, 'Marie Laurent', '0612345678');
+INSERT INTO house_owner (id, name, phone) VALUES (3, 'Pierre Martin', '0623456789');
+INSERT INTO house_owner (id, name, phone) VALUES (4, 'Sophie Dubois', '0634567890');
+INSERT INTO house_owner (id, name, phone) VALUES (5, 'Christophe Leroy', '0645678901');
+INSERT INTO house_owner (id, name, phone) VALUES (6, 'Isabelle Thomas', '0656789012');
+INSERT INTO house_owner (id, name, phone) VALUES (7, 'Olivier Petit', '0667890123');
+INSERT INTO house_owner (id, name, phone) VALUES (8, 'Claire Moreau', '0678901234');
+INSERT INTO house_owner (id, name, phone) VALUES (9, 'Nicolas Rousseau', '0689012345');
+INSERT INTO house_owner (id, name, phone) VALUES (10, 'Emilie Bernard', '0690123456');
+INSERT INTO house_owner (id, name, phone) VALUES (11, 'Alexandre Girard', '0601122334');
+INSERT INTO house_owner (id, name, phone) VALUES (12, 'Camille Lemoine', '0611223344');
+
+UPDATE house SET id_house_owner = 1 WHERE id = 1;
+UPDATE house SET id_house_owner = 2 WHERE id = 2;
+UPDATE house SET id_house_owner = 3 WHERE id = 3;
+UPDATE house SET id_house_owner = 4 WHERE id = 4;
+UPDATE house SET id_house_owner = 5 WHERE id = 5;
+UPDATE house SET id_house_owner = 6 WHERE id = 6;
+UPDATE house SET id_house_owner = 7 WHERE id = 7;
+UPDATE house SET id_house_owner = 8 WHERE id = 8;
+UPDATE house SET id_house_owner = 9 WHERE id = 9;
+UPDATE house SET id_house_owner = 10 WHERE id = 10;
+UPDATE house SET id_house_owner = 11 WHERE id = 11;
+UPDATE house SET id_house_owner = 12 WHERE id = 12;

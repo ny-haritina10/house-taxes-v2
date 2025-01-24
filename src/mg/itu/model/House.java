@@ -92,6 +92,29 @@ public class House extends ClassMAPTable {
         return totalSurface;
     }    
 
+    public Commune getCommune(Connection connection) {
+        Commune commune = null;
+        String query = "SELECT commune_id, commune_label FROM house_commune_view WHERE house_id = ?";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId());
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    commune = new Commune(
+                        resultSet.getString("commune_id"),
+                        resultSet.getString("commune_label")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving commune for house.", e);
+        }
+    
+        return commune;
+    }
+
     @Override
     public String[] getMotCles() {
         String[] motCles = { "id", "id_arrondissement", "label", "width", "height", "nbr_floor", "longitude", "latitude" };
