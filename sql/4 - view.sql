@@ -59,14 +59,3 @@ FROM
     facture f
 JOIN 
     house h ON f.id_house = h.id;
-
-
-
-    SELECT 
-                *
-            FROM 
-                house_invoice_simple
-            WHERE 
-                house_id = 1
-                AND year = ? 
-                AND month = ?
