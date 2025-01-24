@@ -264,3 +264,6 @@ VALUES (11, 78000, 2023, 10, 100, 1.0, 11);
 -- Facture pour la maison 12
 INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
 VALUES (12, 102200, 2023, 10, 100, 1.2, 12);
+
+
+INSERT INTO users (id, id_commune, user_name, user_password) VALUES (1, 1, 'proprio 1', 'proprio1');
