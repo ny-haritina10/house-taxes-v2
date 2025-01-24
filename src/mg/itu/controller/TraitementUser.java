@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import utils.User;
+import mg.itu.model.User;
 import mg.itu.database.Database;
 
 @WebServlet("/controller/TraitementUser")

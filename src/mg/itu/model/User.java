@@ -1,4 +1,4 @@
-package utils;
+package mg.itu.model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
