@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import bean.CGenUtil;
 import mg.itu.database.Database;
+import mg.itu.model.Facture;
 import mg.itu.model.House;
 import mg.itu.model.PricePerM2;
 
@@ -31,16 +32,27 @@ public class MainController extends HttpServlet {
             );
 
             for (House house : houses) {
-                System.out.println("h-" + house.getId() + " = " +house.calculateSurface(con, 1, 2025));
+                System.out.println("h-" + house.getId() + " = " + house.calculateSurface(con, 1, 2025));
                 PricePerM2 pricePerM2 = house.getPricePerM2(con, 2025, 1);
 
                 System.out.println("Amount: " + pricePerM2.getAmount());
-                System.out.println("Date: " + pricePerM2.getDatePrice());            
+                System.out.println("Date: " + pricePerM2.getDatePrice());
+
+                Facture facture = new Facture(
+                    house.calculateSurface(con, 1, 2025), 
+                    2025, 
+                    1, 
+                    pricePerM2.getAmount(), 
+                    1.2, // hard coded
+                    house.getId() 
+                );
+
+                facture.insert(con);
+                System.out.println("Facture inserted for house: " + house.getId());
             }
 
             req.getRequestDispatcher("/WEB-INF/views/main.jsp").forward(req, resp);  
         } 
-        
         catch (Exception e) {
             e.printStackTrace();
         }  
@@ -50,6 +62,6 @@ public class MainController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
         throws ServletException, IOException 
     {
-        
+        // Handle POST requests if needed
     }
 }

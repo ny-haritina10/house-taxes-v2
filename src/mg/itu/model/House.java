@@ -14,6 +14,7 @@ import bean.ClassMAPTable;
 public class House extends ClassMAPTable {
 
     String id;
+    String idHouseOwner;
     String idArrondissement;
     String label;
     double width;
@@ -26,9 +27,10 @@ public class House extends ClassMAPTable {
         super.setNomTable("house");
     }
 
-    public House(String id, String idArrondissement, String label, double width, double height, int nbrFloor, double longitude, double latitude) {
+    public House(String id,  String idArrondissement, String idHouseOwner,String label, double width, double height, int nbrFloor, double longitude, double latitude) {
         this.id = id;
         this.idArrondissement = idArrondissement;
+        this.idHouseOwner = idHouseOwner;
         this.label = label;
         this.width = width;
         this.height = height;
@@ -313,4 +315,12 @@ public class House extends ClassMAPTable {
 
     public void setLatitude(double latitude) 
     { this.latitude = latitude; }
+
+    public String getIdHouseOwner() {
+        return idHouseOwner;
+    }
+
+    public void setIdHouseOwner(String idHouseOwner) {
+        this.idHouseOwner = idHouseOwner;
+    }
 }

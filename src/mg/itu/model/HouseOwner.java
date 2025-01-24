@@ -36,6 +36,7 @@ public class HouseOwner extends ClassMAPTable {
                     House house = new House(
                         resultSet.getString("id"),
                         resultSet.getString("id_arrondissement"),
+                        resultSet.getString("id_house_owner"),
                         resultSet.getString("label"),
                         resultSet.getDouble("width"),
                         resultSet.getDouble("height"),
