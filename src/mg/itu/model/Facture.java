@@ -3,6 +3,7 @@ package mg.itu.model;
 import bean.ClassMAPTable;
 
 public class Facture extends ClassMAPTable {
+    
    String id;
    double totalSurface;
    int year;

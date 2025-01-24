@@ -10,6 +10,7 @@ import java.util.List;
 import bean.ClassMAPTable;
 
 public class HouseOwner extends ClassMAPTable {
+    
    String id;
    String name;
    String phone;

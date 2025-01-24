@@ -185,6 +185,8 @@ VALUES (23, 12, 2);
 INSERT INTO house_caracteristique (id, id_house, id_house_composant_material)
 VALUES (24, 12, 6);
 
+/* ######################################## */
+
 INSERT INTO house_owner (id, name, phone) VALUES (1, 'Jean Dupont', '0601020304');
 INSERT INTO house_owner (id, name, phone) VALUES (2, 'Marie Laurent', '0612345678');
 INSERT INTO house_owner (id, name, phone) VALUES (3, 'Pierre Martin', '0623456789');
