@@ -184,3 +184,81 @@ INSERT INTO house_caracteristique (id, id_house, id_house_composant_material)
 VALUES (23, 12, 2);
 INSERT INTO house_caracteristique (id, id_house, id_house_composant_material)
 VALUES (24, 12, 6);
+
+INSERT INTO house_owner (id, name, phone) VALUES (1, 'Jean Dupont', '0601020304');
+INSERT INTO house_owner (id, name, phone) VALUES (2, 'Marie Laurent', '0612345678');
+INSERT INTO house_owner (id, name, phone) VALUES (3, 'Pierre Martin', '0623456789');
+INSERT INTO house_owner (id, name, phone) VALUES (4, 'Sophie Dubois', '0634567890');
+INSERT INTO house_owner (id, name, phone) VALUES (5, 'Christophe Leroy', '0645678901');
+INSERT INTO house_owner (id, name, phone) VALUES (6, 'Isabelle Thomas', '0656789012');
+INSERT INTO house_owner (id, name, phone) VALUES (7, 'Olivier Petit', '0667890123');
+INSERT INTO house_owner (id, name, phone) VALUES (8, 'Claire Moreau', '0678901234');
+INSERT INTO house_owner (id, name, phone) VALUES (9, 'Nicolas Rousseau', '0689012345');
+INSERT INTO house_owner (id, name, phone) VALUES (10, 'Emilie Bernard', '0690123456');
+INSERT INTO house_owner (id, name, phone) VALUES (11, 'Alexandre Girard', '0601122334');
+INSERT INTO house_owner (id, name, phone) VALUES (12, 'Camille Lemoine', '0611223344');
+
+UPDATE house SET id_house_owner = 1 WHERE id = 1;
+UPDATE house SET id_house_owner = 2 WHERE id = 2;
+UPDATE house SET id_house_owner = 3 WHERE id = 3;
+UPDATE house SET id_house_owner = 4 WHERE id = 4;
+UPDATE house SET id_house_owner = 5 WHERE id = 5;
+UPDATE house SET id_house_owner = 6 WHERE id = 6;
+UPDATE house SET id_house_owner = 7 WHERE id = 7;
+UPDATE house SET id_house_owner = 8 WHERE id = 8;
+UPDATE house SET id_house_owner = 9 WHERE id = 9;
+UPDATE house SET id_house_owner = 10 WHERE id = 10;
+UPDATE house SET id_house_owner = 11 WHERE id = 11;
+UPDATE house SET id_house_owner = 12 WHERE id = 12;
+
+/*================================================================== */
+/*================================================================== */
+/*================================================================== */
+
+-- Facture pour la maison 1
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (1, 160000, 2023, 10, 100, 1.2, 1);
+
+-- Facture pour la maison 2
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (2, 13500, 2023, 10, 100, 1.1, 2);
+
+-- Facture pour la maison 3
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (3, 1260000, 2023, 10, 100, 1.3, 3);
+
+-- Facture pour la maison 4
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (4, 45000, 2023, 10, 100, 1.0, 4);
+
+-- Facture pour la maison 5
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (5, 280800, 2023, 10, 100, 1.2, 5);
+
+-- Facture pour la maison 6
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (6, 507600, 2023, 10, 100, 1.1, 6);
+
+-- Facture pour la maison 7
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (7, 22000, 2023, 10, 100, 1.0, 7);
+
+-- Facture pour la maison 8
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (8, 252000, 2023, 10, 100, 1.2, 8);
+
+-- Facture pour la maison 9
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (9, 600000, 2023, 10, 100, 1.3, 9);
+
+-- Facture pour la maison 10
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (10, 300000, 2023, 10, 100, 1.1, 10);
+
+-- Facture pour la maison 11
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (11, 78000, 2023, 10, 100, 1.0, 11);
+
+-- Facture pour la maison 12
+INSERT INTO facture (id, totalSurface, year, month, unit_price, coefficient, id_house)
+VALUES (12, 102200, 2023, 10, 100, 1.2, 12);

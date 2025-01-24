@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import bean.CGenUtil;
 import bean.ClassMAPTable;
@@ -37,7 +39,7 @@ public class House extends ClassMAPTable {
 
     public double calculateSurface(Connection connection, int month, int year) {
         double totalSurface = 0.0;
-    
+
         String query = """
             WITH relevant_history AS (
                 SELECT width, height, changed_at
@@ -69,13 +71,13 @@ public class House extends ClassMAPTable {
                 SELECT width, height FROM fallback_to_house
             )
         """;
-    
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, this.getId()); 
             String targetDate = String.format("%04d-%02d-31", year, month); 
             preparedStatement.setString(2, targetDate); 
             preparedStatement.setString(3, this.getId()); 
-    
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     totalSurface = resultSet.getDouble("total_surface");
@@ -85,14 +87,14 @@ public class House extends ClassMAPTable {
             e.printStackTrace();
             throw new RuntimeException("Error calculating total surface area.", e);
         }
-    
+
         return totalSurface;
-    }    
+    }
 
     public PricePerM2 getPricePerM2(Connection connection, int year, int month) throws Exception {
         double amount = 0.0;
         Date datePrice = null;
-    
+
         String query = """
             WITH relevant_history AS (
                 SELECT amount_per_m2, changed_at,
@@ -152,10 +154,10 @@ public class House extends ClassMAPTable {
             ) AS date_price
             FROM dual                                                          
         """;
-    
+
         Arrondissement arrondissement = (Arrondissement) new Arrondissement().getById(this.getIdArrondissement(), "arrondissement", connection);
         Commune commune = (Commune) new Commune().getById(arrondissement.getIdCommune(), "commune", connection);
-    
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, commune.getId());
             String targetDate = String.format("%04d-%02d-31", year, month); 
@@ -164,7 +166,7 @@ public class House extends ClassMAPTable {
             preparedStatement.setString(4, commune.getId()); 
             preparedStatement.setString(5, this.getId()); 
             preparedStatement.setString(6, targetDate); 
-    
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     amount = resultSet.getDouble("amount");
@@ -175,7 +177,7 @@ public class House extends ClassMAPTable {
             e.printStackTrace();
             throw new RuntimeException("Error retrieving price per m2.", e);
         }
-    
+
         // If no data is found, query TAXE_PER_COMMUNE directly
         if (amount == 0) {
             String sql = "SELECT amount_per_m2, date_taxe FROM taxe_per_commune WHERE id_commune = ?";
@@ -192,10 +194,63 @@ public class House extends ClassMAPTable {
                 throw new RuntimeException("Error retrieving fallback price per m2.", e);
             }
         }
-    
+
         return new PricePerM2(amount, datePrice);
     }
 
+    public Commune getCommune(Connection connection) {
+        Commune commune = null;
+        String query = "SELECT commune_id, commune_label FROM house_commune_view WHERE house_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    commune = new Commune(
+                        resultSet.getString("commune_id"),
+                        resultSet.getString("commune_label")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving commune for house.", e);
+        }
+
+        return commune;
+    }
+
+    public List<Facture> getFactureByMonthYear(Connection connection, int year, int month) {
+        List<Facture> factures = new ArrayList<>();
+        String query = "SELECT * FROM house_invoice_simple WHERE house_id = ? AND year = ? AND month = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId()); 
+            preparedStatement.setInt(2, year); 
+            preparedStatement.setInt(3, month); 
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Facture facture = new Facture(
+                        resultSet.getString("facture_id"),
+                        resultSet.getDouble("total_surface"),
+                        resultSet.getInt("year"),
+                        resultSet.getInt("month"),
+                        resultSet.getDouble("unit_price"),
+                        resultSet.getDouble("coefficient"),
+                        resultSet.getString("house_id")
+                    );
+                    factures.add(facture);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la récupération des factures.", e);
+        }
+
+        return factures;
+    }
 
     @Override
     public String[] getMotCles() {
