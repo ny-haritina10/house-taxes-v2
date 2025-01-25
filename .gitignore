@@ -30,3 +30,6 @@ web/assets/
 _db.properties
 _config.conf
 src/mg/itu/database/Database.java
+_config.conf
+_db.properties
+backup.md
