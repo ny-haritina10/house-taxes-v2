@@ -1,5 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="mg.itu.model.Facture" %>
+<%@ page import="mg.itu.model.*" %>
+
+<%@ page import="java.text.NumberFormat" %>
+<%@ page import="java.util.Locale" %>
+
+
+<%
+    Facture facture = (Facture) request.getAttribute("facture");
+    House house = (House) request.getAttribute("house");
+    Arrondissement arrondissement = (Arrondissement) request.getAttribute("arrondissement");
+    Commune commune = (Commune) request.getAttribute("commune");
+    HouseOwner owner = (HouseOwner) request.getAttribute("owner");
+
+    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.FRANCE); 
+    currencyFormatter.setMaximumFractionDigits(0); 
+
+    String formattedUnitPrice = currencyFormatter.format(facture.getUnitPrice());
+    String formattedTotalAmount = currencyFormatter.format(facture.getMonthlyMonthlyAmountToPay());
+%>
 
 <%@ include file="../../templates/header.jsp" %>
 <div class="content-wrapper" style="min-height:680px;">
@@ -12,18 +30,30 @@
                   </div>
                   <div class="box-body">
                       <%
-                          Facture facture = (Facture) request.getAttribute("facture");
-                          if (facture != null) {
+                        if (facture != null) {
                       %>
                       <div class="card">
                           <div class="card-body">
-                              <p><strong>ID:</strong> <%= facture.getId() %></p>
+                              <h3>Period: <%= facture.getMonth() + "/" + facture.getYear() %></h3>
+                              <% if (facture.getIsPayed().equals("N")) { %>
+                                <h4>Unpayed facture</h4>
+                              <% } else { %>
+                                <h4>Payed facture</h4>
+                              <% } %>
+
+                              <h4>Date payment: <%= facture.getDatePaymentFacture() %></h4>
+
+                              <p><strong>ID:</strong> FACT-00<%= facture.getId() %></p>
                               <p><strong>Total Surface:</strong> <%= facture.getTotalSurface() %></p>
-                              <p><strong>Year:</strong> <%= facture.getYear() %></p>
-                              <p><strong>Month:</strong> <%= facture.getMonth() %></p>
-                              <p><strong>Unit Price:</strong> <%= facture.getUnitPrice() %></p>
-                              <p><strong>Coefficient:</strong> <%= facture.getCoefficient() %></p>
-                              <p><strong>House ID:</strong> <%= facture.getIdHouse() %></p>
+                              <p><strong>Price per m2:</strong> <%= formattedUnitPrice %></p>
+                              <p><strong>Total Coefficient:</strong> <%= facture.getCoefficient() %> </p>
+                              <p><strong>Total Amount To Pay:</strong> <b><%= formattedTotalAmount %></b></p>
+                              <br>
+                              <h3>House details</h3>
+                              <p><strong>Owner:</strong> <%= owner.getName() %></p>
+                              <p><strong>House:</strong> <%= house.getLabel() %></p>
+                              <p><strong>Arrondissement: </strong> <%= arrondissement.getLabel() %></p>
+                              <p><strong>Commune: </strong> <%= commune.getLabel() %></p>
                           </div>
                       </div>
                       <%

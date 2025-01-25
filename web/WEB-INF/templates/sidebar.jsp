@@ -13,7 +13,8 @@
           </a>
 
           <ul class="treeview-menu">
-              <li><a href="EditionController" class=""><i class="fa fa-plus"></i>Form</a></li>
+              <li><a href="EditionController"><i class="fa fa-plus"></i>Formulaire facture</a></li>
+              <li><a href="EditionController?action=list"><i class="fa fa-plus"></i>Liste facture</a></li>
           </ul>
         </li>
       </div>

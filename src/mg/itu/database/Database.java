@@ -12,7 +12,7 @@ public class Database {
     private static String url;
     private static String username;
     private static String password;
-    private static String propertiesFileName = "D:\\etude\\S5\\git\\house-taxes-v2\\_db.properties";
+    private static String propertiesFileName = "D:\\Studies\\ITU\\S5\\INF301_Architechture-Logiciel\\projet\\house-taxes-v2\\_db.properties";
 
     // static initializer block  
     // ensures the configuration is loaded only once 

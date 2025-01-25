@@ -60,7 +60,7 @@ public class HouseComposantMaterial extends ClassMAPTable {
         this.idMaterial = idMaterial;
     }
 
-    public double getCoefficient() {
+    public double calculateTotalCoefficient() {
         return coefficient;
     }
 

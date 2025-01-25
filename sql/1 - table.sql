@@ -314,3 +314,17 @@ BEGIN
     END IF;
 END;
 /
+
+
+/*================================================================== */
+/*================================================================== */
+/*================================================================== */
+
+ALTER TABLE facture
+MODIFY monthly_amount_to_pay NUMBER(15, 2);
+
+ALTER TABLE facture
+ADD is_payed CHAR(1) DEFAULT 'N';
+
+ALTER TABLE facture 
+ADD date_payment_facture DATE DEFAULT NULL;

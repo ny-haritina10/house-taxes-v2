@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="mg.itu.model.*" %>
+<%@ page import="java.util.List" %>
 
 <%
   String message = (String) request.getAttribute("message");
+  List<House> houses = (List<House>) request.getAttribute("houses");
 %>
 
 <%@ include file="../../templates/header.jsp" %>
@@ -50,6 +53,21 @@
                         <option value="10">October</option>
                         <option value="11">November</option>
                         <option value="12">December</option>
+                      </select>
+                    </td>
+                  </tr>
+
+                  <!--- Houses -->
+                  <tr>
+                    <th>
+                      <label for="house">House</label>
+                    </th>
+                    <td>
+                      <select class="form-control" id="house" name="house" required>
+                        <option value="">Select a house</option>
+                        <% for(House house : houses) { %>
+                          <option value="<%= house.getId() %>"><%= house.getLabel() %></option>
+                        <% } %> 
                       </select>
                     </td>
                   </tr>

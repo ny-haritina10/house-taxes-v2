@@ -42,9 +42,9 @@ public class House extends ClassMAPTable {
     public void edition(Connection connection, int year, int month) 
         throws Exception
     {
-        PricePerM2 price = getPricePerM2(connection, year, month);
-        double surface = calculateSurface(connection, month, year);
-        double coeff = getCoeff(connection, year, month);
+        PricePerM2 price = calculatePricePerM2(connection, year, month);
+        double surface = calculateTotalSurface(connection, month, year);
+        double coeff = calculateTotalCoeff(connection, year, month);
 
         Facture facture = new Facture(
             surface,
@@ -58,7 +58,36 @@ public class House extends ClassMAPTable {
         facture.insert(connection);
     }
 
-    public double getCoeff(Connection connection, int year, int month) 
+    public static List<House> getAll(Connection connection) throws SQLException {
+        List<House> houses = new ArrayList<>();
+        String query = "SELECT * FROM house ORDER BY id";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                House house = new House(
+                    resultSet.getString("id"),
+                    resultSet.getString("id_arrondissement"),
+                    resultSet.getString("id_house_owner"),
+                    resultSet.getString("label"),
+                    resultSet.getDouble("width"),
+                    resultSet.getDouble("height"),
+                    resultSet.getInt("nbr_floor"),
+                    resultSet.getDouble("longitude"),
+                    resultSet.getDouble("latitude")
+                );
+                houses.add(house);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error retrieving houses from the database.", e);
+        }
+
+        return houses;
+    }
+
+    public double calculateTotalCoeff(Connection connection, int year, int month) 
         throws Exception 
     {
         double totalCoefficient = 1.0; 
@@ -97,7 +126,7 @@ public class House extends ClassMAPTable {
         return totalCoefficient;
     }
 
-    public PricePerM2 getPricePerM2(Connection connection, int year, int month) throws Exception {
+    public PricePerM2 calculatePricePerM2(Connection connection, int year, int month) throws Exception {
         double amount = 0.0;
         Date datePrice = null;
     
@@ -165,8 +194,9 @@ public class House extends ClassMAPTable {
         Commune commune = (Commune) new Commune().getById(arrondissement.getIdCommune(), "commune", connection);
     
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            String targetDate = String.format("%04d-%02d-27", year, month); 
+
             preparedStatement.setString(1, commune.getId());
-            String targetDate = String.format("%04d-%02d-31", year, month); 
             preparedStatement.setString(2, targetDate); 
             preparedStatement.setString(3, this.getId()); 
             preparedStatement.setString(4, commune.getId()); 
@@ -184,7 +214,6 @@ public class House extends ClassMAPTable {
             throw new RuntimeException("Error retrieving price per m2.", e);
         }
     
-        // If no data is found, query TAXE_PER_COMMUNE directly
         if (amount == 0) {
             String sql = "SELECT amount_per_m2, date_taxe FROM taxe_per_commune WHERE id_commune = ?";
             try (PreparedStatement fallbackStatement = connection.prepareStatement(sql)) {
@@ -204,7 +233,7 @@ public class House extends ClassMAPTable {
         return new PricePerM2(amount, datePrice);
     }
 
-    public double calculateSurface(Connection connection, int month, int year) {
+    public double calculateTotalSurface(Connection connection, int month, int year) {
         double totalSurface = 0.0;
 
         String query = """
@@ -241,7 +270,7 @@ public class House extends ClassMAPTable {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, this.getId()); 
-            String targetDate = String.format("%04d-%02d-31", year, month); 
+            String targetDate = String.format("%04d-%02d-27", year, month); 
             preparedStatement.setString(2, targetDate); 
             preparedStatement.setString(3, this.getId()); 
 
@@ -299,8 +328,12 @@ public class House extends ClassMAPTable {
                         resultSet.getInt("month"),
                         resultSet.getDouble("unit_price"),
                         resultSet.getDouble("coefficient"),
-                        resultSet.getString("house_id")
+                        resultSet.getString("house_id"),
+                        resultSet.getDouble("monthly_amount_to_pay"),
+                        resultSet.getString("isPayed"),
+                        resultSet.getDate("date_payment_facture")
                     );
+
                     factures.add(facture);
                 }
             }
@@ -344,14 +377,48 @@ public class House extends ClassMAPTable {
     
         return arrondissement;
     }
+
+    public static House findById(String id, String tableName, Connection connection) 
+        throws SQLException 
+    {
+        House house = null;
+        String query = "SELECT * FROM " + tableName + " WHERE id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, id);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    house = new House(
+                        resultSet.getString("id"),
+                        resultSet.getString("id_arrondissement"),
+                        resultSet.getString("id_house_owner"),
+                        resultSet.getString("label"),
+                        resultSet.getDouble("width"),
+                        resultSet.getDouble("height"),
+                        resultSet.getInt("nbr_floor"),
+                        resultSet.getDouble("longitude"),
+                        resultSet.getDouble("latitude")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error retrieving house by ID.", e);
+        }
+
+        return house;
+    }
     
-    public HouseOwner getProprietaire(Connection connection) throws Exception{
-        return (HouseOwner) new HouseOwner().getById(this.getIdHouseOwner(), "house_owner", connection);
+    public HouseOwner getProprietaire(Connection connection) 
+        throws Exception
+    {
+        return HouseOwner.findById(this.getIdHouseOwner(), "house_owner", connection);
     }
 
     @Override
     public String[] getMotCles() {
-        String[] motCles = { "id", "id_arrondissement", "label", "width", "height", "nbr_floor", "longitude", "latitude" };
+        String[] motCles = { "id", "id_arrondissement", "label", "width", "height", "nbr_floor", "longitude", "latitude", "id_house_owner" };
         return motCles;
     }
     
@@ -362,6 +429,21 @@ public class House extends ClassMAPTable {
     @Override
     public String getTuppleID() 
     { return id; }
+
+    @Override
+    public String toString() {
+        return "House{" +
+                "id='" + id + '\'' +
+                ", idHouseOwner='" + idHouseOwner + '\'' +
+                ", idArrondissement='" + idArrondissement + '\'' +
+                ", label='" + label + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", nbrFloor=" + nbrFloor +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                '}';
+    }
 
     public String getId() 
     { return id; }
