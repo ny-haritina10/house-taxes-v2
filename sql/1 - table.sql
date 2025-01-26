@@ -75,6 +75,9 @@ CREATE TABLE house (
     CONSTRAINT fk_house_arrondissement FOREIGN KEY (id_arrondissement) REFERENCES arrondissement(id)
 );
 
+ALTER TABLE house 
+ADD last_changement DATE;
+
 /*================================================================== */
 /*================================================================== */
 /*================================================================== */
@@ -172,14 +175,46 @@ AFTER INSERT OR UPDATE OR DELETE ON house
 FOR EACH ROW
 BEGIN
     IF INSERTING THEN
-        INSERT INTO histo_house (id_house, id_arrondissement, label, width, height, nbr_floor, longitude, latitude, change_type, changed_by)
-        VALUES (:NEW.id, :NEW.id_arrondissement, :NEW.label, :NEW.width, :NEW.height, :NEW.nbr_floor, :NEW.longitude, :NEW.latitude, 'INSERT', USER);
+        INSERT INTO histo_house (
+            id_house, id_arrondissement, label, width, height, 
+            nbr_floor, longitude, latitude, change_type, changed_by
+        )
+        VALUES (
+            :NEW.id, :NEW.id_arrondissement, :NEW.label, :NEW.width, :NEW.height, 
+            :NEW.nbr_floor, :NEW.longitude, :NEW.latitude, 'INSERT', USER
+        );
+        
+        IF :NEW.last_changement IS NOT NULL THEN
+            UPDATE histo_house 
+            SET changed_at = :NEW.last_changement 
+            WHERE id_house = :NEW.id AND change_type = 'INSERT';
+        END IF;
+    
     ELSIF UPDATING THEN
-        INSERT INTO histo_house (id_house, id_arrondissement, label, width, height, nbr_floor, longitude, latitude, change_type, changed_by)
-        VALUES (:OLD.id, :OLD.id_arrondissement, :OLD.label, :OLD.width, :OLD.height, :OLD.nbr_floor, :OLD.longitude, :OLD.latitude, 'UPDATE', USER);
+        INSERT INTO histo_house (
+            id_house, id_arrondissement, label, width, height, 
+            nbr_floor, longitude, latitude, change_type, changed_by
+        )
+        VALUES (
+            :OLD.id, :OLD.id_arrondissement, :OLD.label, :OLD.width, :OLD.height, 
+            :OLD.nbr_floor, :OLD.longitude, :OLD.latitude, 'UPDATE', USER
+        );
+        
+        IF :NEW.last_changement IS NOT NULL THEN
+            UPDATE histo_house 
+            SET changed_at = :NEW.last_changement 
+            WHERE id_house = :OLD.id AND change_type = 'UPDATE';
+        END IF;
+    
     ELSIF DELETING THEN
-        INSERT INTO histo_house (id_house, id_arrondissement, label, width, height, nbr_floor, longitude, latitude, change_type, changed_by)
-        VALUES (:OLD.id, :OLD.id_arrondissement, :OLD.label, :OLD.width, :OLD.height, :OLD.nbr_floor, :OLD.longitude, :OLD.latitude, 'DELETE', USER);
+        INSERT INTO histo_house (
+            id_house, id_arrondissement, label, width, height, 
+            nbr_floor, longitude, latitude, change_type, changed_by
+        )
+        VALUES (
+            :OLD.id, :OLD.id_arrondissement, :OLD.label, :OLD.width, :OLD.height, 
+            :OLD.nbr_floor, :OLD.longitude, :OLD.latitude, 'DELETE', USER
+        );
     END IF;
 END;
 /
@@ -326,7 +361,7 @@ END;
 /*================================================================== */
 
 ALTER TABLE facture
-MODIFY monthly_amount_to_pay NUMBER(15, 2);
+ADD monthly_amount_to_pay NUMBER(15, 2);
 
 ALTER TABLE facture
 ADD is_payed CHAR(1) DEFAULT 'N';
