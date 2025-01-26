@@ -10,43 +10,43 @@ INSERT INTO arrondissement (id, id_commune, label) VALUES (4, 1, '4eme arrondiss
 
 -- Arrondissement Position
 /* ARR - 1 ############################## */
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (1, 1, -18.58910, 47.08053);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (2, 1, -18.84027, 46.79626);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (3, 1, -18.99235, 46.91848);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (4, 1, -19.02872, 47.17666);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (5, 1, -18.84807, 47.55844);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (6, 1, -18.64379, 47.51312);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (7, 1, -18.56305, 47.19451);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (8, 1, -18.58910, 47.08053);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (1, 1, -18.589103, 47.080536);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (2, 1, -18.840271, 46.796265);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (3, 1, -18.99235, 46.918488);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (4, 1, -19.028725, 47.176666);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (5, 1, -18.848073, 47.558441);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (6, 1, -18.643793, 47.513123);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (7, 1, -18.563054, 47.194519);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (8, 1, -18.589103, 47.080536);
 
 /* ARR - 2 ############################## */
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (9, 2, -18.71408, 47.79464);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (10, 2, -18.77653, 47.79464);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (11, 2, -18.84287, 47.84957);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (12, 2, -18.89228, 47.90039);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (13, 2, -18.95856, 48.01025);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (14, 2, -18.77653, 48.13247);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (15, 2, -18.65551, 48.25332);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (16, 2, -18.53960, 48.21212);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (17, 2, -18.48227, 48.06381);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (18, 2, -18.46663, 47.89764);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (19, 2, -18.49661, 47.92236);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (20, 2, -18.71408, 47.79464);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (9, 2, -18.714083, 47.794647);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (10, 2, -18.776539, 47.794647);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (11, 2, -18.842872, 47.849579);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (12, 2, -18.89228, 47.900391);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (13, 2, -18.958568, 48.010254);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (14, 2, -18.776539, 48.132477);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (15, 2, -18.655511, 48.253326);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (16, 2, -18.539607, 48.212128);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (17, 2, -18.482278, 48.063812);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (18, 2, -18.466639, 47.897644);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (19, 2, -18.496612, 47.922363);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (20, 2, -18.714083, 47.794647);
 
 /* ARR - 3 ############################## */
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (21, 3, -19.07807, 47.32772);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (22, 3, -19.05547, 47.61749);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (23, 3, -19.27273, 47.76580);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (24, 3, -19.35702, 47.43621);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (25, 3, -19.26625, 47.26455);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (26, 3, -19.07807, 47.32772);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (21, 3, -19.07807, 47.327728);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (22, 3, -19.075472, 47.617493);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (23, 3, -19.272739, 47.765808);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (24, 3, -19.357025, 47.436218);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (25, 3, -19.266254, 47.264557);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (26, 3, -19.07807, 47.327728);
 
 /* ARR - 4 ############################## */
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (27, 4, -18.37798, 47.46368);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (28, 4, -18.69195, 47.59002);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (29, 4, -18.55262, 47.82486);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (30, 4, -18.32973, 47.62710);
-INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (31, 4, -18.37798, 47.46368);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (27, 4, -18.377986, 47.463684);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (28, 4, -18.691951, 47.590027);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (29, 4, -18.552627, 47.82486);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (30, 4, -18.329732, 47.627106);
+INSERT INTO arrondissement_position (id, id_arrondissement, longitude, latitude) VALUES (31, 4, -18.377986, 47.463684);
 
 /* MATERIAL ########################################## */
 INSERT INTO material (id, label) VALUES (1, 'Hazo');

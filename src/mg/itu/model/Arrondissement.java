@@ -25,6 +25,30 @@ public class Arrondissement extends ClassMAPTable {
         this.label = label;
     }
 
+    public static List<ArrondissementPosition> getAllArrondissementPosition(Connection connection) throws SQLException {
+        List<ArrondissementPosition> positions = new ArrayList<>();
+        String query = "SELECT * FROM arrondissement_position ORDER BY id_arrondissement, id";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+    
+            while (resultSet.next()) {
+                ArrondissementPosition position = new ArrondissementPosition(
+                    resultSet.getString("id"),
+                    resultSet.getString("id_arrondissement"),
+                    resultSet.getDouble("longitude"),
+                    resultSet.getDouble("latitude")
+                );
+                positions.add(position);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error retrieving arrondissement positions from the database.", e);
+        }
+    
+        return positions;
+    }
+    
     public List<House> getHouses(Connection connection) throws SQLException {
         List<House> houses = new ArrayList<>();
         String query = "SELECT * FROM house WHERE id_arrondissement = ?";

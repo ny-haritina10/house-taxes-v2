@@ -26,7 +26,7 @@
                           <div class="form-group">
                               <div class="col-md-4">
                                   <label for="year">Year</label>
-                                  <input type="number" class="form-control" id="year" name="year" value="<%= year != null ? year : "" %>" required>
+                                  <input type="number" value="2025" class="form-control" id="year" name="year" value="<%= year != null ? year : "" %>" required>
                               </div>
                           </div>
                           <div class="form-group">

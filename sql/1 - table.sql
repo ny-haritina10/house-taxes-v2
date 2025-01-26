@@ -42,6 +42,12 @@ CREATE TABLE arrondissement_position (
     CONSTRAINT fk_arrondissement_position FOREIGN KEY (id_arrondissement) REFERENCES arrondissement(id)
 );
 
+ALTER TABLE arrondissement_position 
+MODIFY longitude NUMBER(10, 7);
+
+ALTER TABLE arrondissement_position 
+MODIFY latitude NUMBER(10, 7);
+
 /*================================================================== */
 /*================================================================== */
 /*================================================================== */
