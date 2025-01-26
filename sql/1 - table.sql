@@ -176,49 +176,41 @@ FOR EACH ROW
 BEGIN
     IF INSERTING THEN
         INSERT INTO histo_house (
-            id_house, id_arrondissement, label, width, height, 
-            nbr_floor, longitude, latitude, change_type, changed_by
+            id, id_house, id_arrondissement, label, width, height, 
+            nbr_floor, longitude, latitude, change_type, changed_by, changed_at
         )
         VALUES (
+            h_surface_house_seq.NEXTVAL, 
             :NEW.id, :NEW.id_arrondissement, :NEW.label, :NEW.width, :NEW.height, 
-            :NEW.nbr_floor, :NEW.longitude, :NEW.latitude, 'INSERT', USER
+            :NEW.nbr_floor, :NEW.longitude, :NEW.latitude, 'INSERT', USER, 
+            COALESCE(:NEW.last_changement, CURRENT_TIMESTAMP)
         );
-        
-        IF :NEW.last_changement IS NOT NULL THEN
-            UPDATE histo_house 
-            SET changed_at = :NEW.last_changement 
-            WHERE id_house = :NEW.id AND change_type = 'INSERT';
-        END IF;
     
     ELSIF UPDATING THEN
         INSERT INTO histo_house (
-            id_house, id_arrondissement, label, width, height, 
-            nbr_floor, longitude, latitude, change_type, changed_by
+            id, id_house, id_arrondissement, label, width, height, 
+            nbr_floor, longitude, latitude, change_type, changed_by, changed_at
         )
-        VALUES (
-            :OLD.id, :OLD.id_arrondissement, :OLD.label, :OLD.width, :OLD.height, 
-            :OLD.nbr_floor, :OLD.longitude, :OLD.latitude, 'UPDATE', USER
+         VALUES (
+            h_surface_house_seq.NEXTVAL, 
+            :NEW.id, :NEW.id_arrondissement, :NEW.label, :NEW.width, :NEW.height, 
+            :NEW.nbr_floor, :NEW.longitude, :NEW.latitude, 'update', USER, 
+            COALESCE(:NEW.last_changement, CURRENT_TIMESTAMP)
         );
-        
-        IF :NEW.last_changement IS NOT NULL THEN
-            UPDATE histo_house 
-            SET changed_at = :NEW.last_changement 
-            WHERE id_house = :OLD.id AND change_type = 'UPDATE';
-        END IF;
     
     ELSIF DELETING THEN
         INSERT INTO histo_house (
-            id_house, id_arrondissement, label, width, height, 
+            id, id_house, id_arrondissement, label, width, height, 
             nbr_floor, longitude, latitude, change_type, changed_by
         )
         VALUES (
+            h_surface_house_seq.NEXTVAL,
             :OLD.id, :OLD.id_arrondissement, :OLD.label, :OLD.width, :OLD.height, 
             :OLD.nbr_floor, :OLD.longitude, :OLD.latitude, 'DELETE', USER
         );
     END IF;
 END;
 /
-
 /*================================================================== */
 /*================================================================== */
 /*================================================================== */
