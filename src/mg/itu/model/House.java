@@ -163,14 +163,16 @@ public class House extends ClassMAPTable {
     
         double width = dimensions[0];
         double height = dimensions[1];
-        return width * height;
+        double nbrFloor = dimensions[2];
+
+        return width * height * nbrFloor;
     }
     
     private double[] getMostRecentDimensionsFromHistory(Connection connection, int year, int month) throws SQLException {
         String query = """
-            SELECT width, height
+            SELECT width, height, nbr_floor
             FROM (
-                SELECT width, height, changed_at
+                SELECT width, height, nbr_floor, changed_at
                 FROM histo_house
                 WHERE id_house = ?
                 AND changed_at <= TO_DATE(?, 'YYYY-MM-DD')
@@ -189,7 +191,9 @@ public class House extends ClassMAPTable {
                 if (resultSet.next()) {
                     double width = resultSet.getDouble("width");
                     double height = resultSet.getDouble("height");
-                    return new double[] { width, height };
+                    double nbrFloor = resultSet.getDouble("nbr_floor");
+
+                    return new double[] { width, height, nbrFloor};
                 }
             }
         }
@@ -198,7 +202,7 @@ public class House extends ClassMAPTable {
     }
     
     private double[] getFallbackDimensions(Connection connection) throws SQLException {
-        String query = "SELECT width, height FROM house WHERE id = ?";
+        String query = "SELECT width, height, nbr_floor FROM house WHERE id = ?";
     
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, this.getId());
@@ -207,7 +211,9 @@ public class House extends ClassMAPTable {
                 if (resultSet.next()) {
                     double width = resultSet.getDouble("width");
                     double height = resultSet.getDouble("height");
-                    return new double[] { width, height };
+                    double nbrFloor = resultSet.getDouble("nbr_floor");
+
+                    return new double[] { width, height, nbrFloor};
                 }
             }
         }
