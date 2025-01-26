@@ -6,6 +6,7 @@
 
 <%
     List<ArrondissementSituationPayment> situations = (List<ArrondissementSituationPayment>) request.getAttribute("situations");
+    List<Arrondissement> arrondissements = (List<Arrondissement>) request.getAttribute("arrondissements");
     Integer year = (Integer) request.getAttribute("year");
     NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.FRANCE);
 %>
@@ -18,7 +19,7 @@
           <div class="col-md-12">
               <div class="box box-solid">
                   <div style="background:#103a8e; color:white;" class="box-header with-border">
-                      <h3 class="box-title">Filter by Year</h3>
+                      <h3 class="box-title">Filter by Year and Arrondissement</h3>
                   </div>
                   <div class="box-body">
                       <form action="ArrondissementSituationController" method="get">
@@ -26,7 +27,22 @@
                           <div class="form-group">
                               <div class="col-md-4">
                                   <label for="year">Year</label>
-                                  <input type="number" value="2025" class="form-control" id="year" name="year" value="<%= year != null ? year : "" %>" required>
+                                  <input type="number" class="form-control" value="2024" id="year" name="year" value="<%= year != null ? year : "" %>" required>
+                              </div>
+                              <div class="col-md-4">
+                                  <label for="arrondissement">Arrondissement</label>
+                                  <select class="form-control" id="arrondissement" name="arrondissement">
+                                      <option value="">Select an Arrondissement</option>
+                                      <%
+                                          if (arrondissements != null && !arrondissements.isEmpty()) {
+                                              for (Arrondissement arrondissement : arrondissements) {
+                                      %>
+                                              <option value="<%= arrondissement.getId() %>"><%= arrondissement.getLabel() %></option>
+                                      <%
+                                              }
+                                          }
+                                      %>
+                                  </select>
                               </div>
                           </div>
                           <div class="form-group">

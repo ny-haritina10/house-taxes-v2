@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="mg.itu.model.HouseSituationPayment" %>
+<%@ page import="mg.itu.model.House" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.util.Locale" %>
 
 <%
     List<HouseSituationPayment> situations = (List<HouseSituationPayment>) request.getAttribute("situations");
+    List<House> houses = (List<House>) request.getAttribute("houses");
     Integer year = (Integer) request.getAttribute("year");
     NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.FRANCE);
 %>
@@ -18,7 +20,7 @@
           <div class="col-md-12">
               <div class="box box-solid">
                   <div style="background:#103a8e; color:white;" class="box-header with-border">
-                      <h3 class="box-title">Filter by Year</h3>
+                      <h3 class="box-title">Filter by Year and House</h3>
                   </div>
                   <div class="box-body">
                       <form action="SituationPaymentController" method="get">
@@ -26,7 +28,22 @@
                           <div class="form-group">
                               <div class="col-md-4">
                                   <label for="year">Year</label>
-                                  <input type="number" value="2025" class="form-control" id="year" name="year" value="<%= year != null ? year : "" %>" required>
+                                  <input type="number" value="2024" class="form-control" id="year" name="year" value="<%= year != null ? year : "" %>" required>
+                              </div>
+                              <div class="col-md-4">
+                                  <label for="house">House</label>
+                                  <select class="form-control" id="house" name="house">
+                                      <option value="">Select a House</option>
+                                      <%
+                                          if (houses != null && !houses.isEmpty()) {
+                                              for (House house : houses) {
+                                      %>
+                                              <option value="<%= house.getId() %>"><%= house.getLabel() %></option>
+                                      <%
+                                              }
+                                          }
+                                      %>
+                                  </select>
                               </div>
                           </div>
                           <div class="form-group">

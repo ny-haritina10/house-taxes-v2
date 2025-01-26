@@ -27,29 +27,42 @@ public class ArrondissementSituationController extends HttpServlet {
         if ("view".equals(action)) {
             try (Connection connection = Database.getConnection()) {
                 int year = Integer.parseInt(req.getParameter("year"));
+                String arrondissementId = req.getParameter("arrondissement");
 
                 List<Arrondissement> arrondissements = Arrondissement.getAll(connection);
+
                 List<ArrondissementSituationPayment> situations = new ArrayList<>();
-                
                 for (Arrondissement arrondissement : arrondissements) {
-                    ArrondissementSituationPayment situation = arrondissement.getTotalArrondissementSituation(connection, year);
-                    situations.add(situation);
+                    if (arrondissementId == null || arrondissementId.isEmpty() || arrondissementId.equals(arrondissement.getId())) {
+                        ArrondissementSituationPayment situation = arrondissement.getTotalArrondissementSituation(connection, year);
+                        situations.add(situation);
+                    }
                 }
 
                 req.setAttribute("situations", situations);
                 req.setAttribute("year", year);
+                req.setAttribute("arrondissements", arrondissements); 
+
+                req.getRequestDispatcher("/WEB-INF/views/situation/situation-arrondissement.jsp").forward(req, resp);
+            } 
+
+            catch (Exception e) {
+                e.printStackTrace();
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving arrondissement situations.");
+            }
+        } 
+
+        else {
+            try (Connection connection = Database.getConnection()) {
+                List<Arrondissement> arrondissements = Arrondissement.getAll(connection);
+                req.setAttribute("arrondissements", arrondissements); 
 
                 req.getRequestDispatcher("/WEB-INF/views/situation/situation-arrondissement.jsp").forward(req, resp);
             } 
             
             catch (Exception e) {
                 e.printStackTrace();
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving arrondissement situations.");
             }
-        } 
-        
-        else {
-            req.getRequestDispatcher("/WEB-INF/views/situation/situation-arrondissement.jsp").forward(req, resp);
         }
     }
 

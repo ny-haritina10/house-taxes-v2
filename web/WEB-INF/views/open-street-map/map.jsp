@@ -31,28 +31,42 @@
 
     $.getJSON("MapController", function(data) {
         data.houses.forEach(function(house) {
-          var latitude = house.latitude;
-          var longitude = house.longitude;
-          var label = house.label;
+            var latitude = house.latitude;
+            var longitude = house.longitude;
+            var label = house.label;
+            var houseId = house.id;
 
-          if (latitude && longitude) {
-            L.marker([latitude, longitude])
-              .addTo(map)
-              .bindPopup(label); 
-          }
+            if (latitude && longitude) {
+                var marker = L.marker([latitude, longitude])
+                    .addTo(map)
+                    .bindPopup(label);
+
+                marker.on('click', function() {
+                    window.location.href = "http://localhost:8080/house-taxes-v2/controller/SituationPaymentController?action=view&year=2024&house=" + houseId;
+                });
+            }
         });
 
         for (var idArrondissement in data.arrondissementPositions) {
-          var positions = data.arrondissementPositions[idArrondissement];
-          var polygonPoints = positions.map(function(position) {
-            return [position.longitude, position.latitude];
-          });
+            if (data.arrondissementPositions.hasOwnProperty(idArrondissement)) {
+              var positions = data.arrondissementPositions[idArrondissement];
+              var polygonPoints = positions.map(function(position) {
+                  return [position.longitude, position.latitude];
+              });
 
-          console.log('Points: ', polygonPoints);
+              polygonPoints.push(polygonPoints[0]);
 
-          L.polygon(polygonPoints, { color: 'red' })
-            .bindPopup("Arrondissement " + idArrondissement)
-            .addTo(map);
+              var polygon = L.polygon(polygonPoints, { color: 'red' })
+                  .bindPopup("Arrondissement " + idArrondissement)
+                  .addTo(map);
+
+              (function(idArrondissement) {
+                  polygon.on('click', function() {
+                      console.log("Clicked Arrondissement ID:", idArrondissement); // Debugging
+                      window.location.href = "http://localhost:8080/house-taxes-v2/controller/ArrondissementSituationController?action=view&year=2024&arrondissement=" + idArrondissement;
+                  });
+              })(idArrondissement); 
+            }
         }
     });
   });
