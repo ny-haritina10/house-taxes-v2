@@ -51,6 +51,19 @@ public class Facture extends ClassMAPTable {
         this.idHouse = idHouse;
     }
 
+    public static double getMonthlyAmountToPayByPeriod(Connection connection, int year, int month, House house) 
+        throws Exception
+    {
+        double amount = 0.00;
+
+        PricePerM2 price = house.calculatePricePerM2(connection, year, month);
+        double surface = house.calculateTotalSurface(connection, month, year);
+        double coeff = house.calculateTotalCoefficientByPeriod(connection, year, month);
+
+        amount += (price.getAmount() * surface * coeff);
+        return amount;
+    }
+
     public void setMonthlyAmountToPay(Connection connection) 
         throws Exception
     {
@@ -59,7 +72,7 @@ public class Facture extends ClassMAPTable {
 
         PricePerM2 price = house.calculatePricePerM2(connection, this.getYear(), this.getMonth());
         double surface = house.calculateTotalSurface(connection, this.getMonth(), this.getYear());
-        double coeff = house.calculateTotalCoeff(connection, this.getYear(), this.getMonth());
+        double coeff = house.calculateTotalCoefficientByPeriod(connection, this.getYear(), this.getMonth());
 
         amount += (price.getAmount() * surface * coeff);
 

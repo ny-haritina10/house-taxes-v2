@@ -24,6 +24,7 @@
                           <thead>
                               <tr>
                                   <th style="background-color:#103a8e; color:white">ID</th>
+                                  <th style="background-color:#103a8e; color:white">House</th>
                                   <th style="background-color:#103a8e; color:white">Total Surface</th>
                                   <th style="background-color:#103a8e; color:white">Year</th>
                                   <th style="background-color:#103a8e; color:white">Month</th>
@@ -45,6 +46,7 @@
                               %>
                                       <tr>
                                           <td>FACT-00<%= facture.getId() %></td>
+                                          <td>HOUS-00<%= facture.getIdHouse() %></td>
                                           <td><%= facture.getTotalSurface() %></td>
                                           <td><%= facture.getYear() %></td>
                                           <td><%= facture.getMonth() %></td>

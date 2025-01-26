@@ -14,7 +14,9 @@ JOIN
 JOIN 
     material m ON hcm.id_material = m.id;
 
-
+--
+--
+--
 CREATE OR REPLACE VIEW house_commune_view AS
 SELECT 
     h.id AS house_id,
@@ -26,7 +28,9 @@ FROM
     JOIN arrondissement a ON h.id_arrondissement = a.id
     JOIN commune c ON a.id_commune = c.id;
 
-
+--
+--
+--
 CREATE OR REPLACE VIEW houses_by_owner_view AS
 SELECT 
     ho.id AS owner_id,
@@ -44,7 +48,9 @@ FROM
 LEFT JOIN 
     house h ON ho.id = h.id_house_owner;
 
-
+--
+--
+--
 CREATE OR REPLACE VIEW house_invoice_simple AS
 SELECT 
     f.id AS facture_id,
@@ -61,7 +67,9 @@ JOIN
     house h ON f.id_house = h.id;
 
 
-
+--
+--
+--
 CREATE OR REPLACE VIEW house_arrondissement_view AS
 SELECT 
     h.id AS house_id,

@@ -1,5 +1,12 @@
 package mg.itu.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import bean.ClassMAPTable;
 
 public class HouseComposantMaterial extends ClassMAPTable {
@@ -18,6 +25,84 @@ public class HouseComposantMaterial extends ClassMAPTable {
         this.idHouseComposant = idHouseComposant;
         this.idMaterial = idMaterial;
         this.coefficient = coefficient;
+    }
+
+    public static List<HouseComposantMaterial> getAll(Connection connection) throws SQLException {
+        List<HouseComposantMaterial> materials = new ArrayList<>();
+        String query = "SELECT * FROM house_composant_material";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+    
+            while (resultSet.next()) {
+                HouseComposantMaterial material = new HouseComposantMaterial(
+                    resultSet.getString("id"),
+                    resultSet.getString("id_house_composant"),
+                    resultSet.getString("id_material"),
+                    resultSet.getDouble("coefficient")
+                );
+                materials.add(material);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Error retrieving all house_composant_material records.", e);
+        }
+    
+        return materials;
+    }
+
+    public static HouseComposantMaterial getById(Connection connection, String id) throws SQLException {
+        String query = "SELECT * FROM house_composant_material WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new HouseComposantMaterial(
+                        resultSet.getString("id"),
+                        resultSet.getString("id_house_composant"),
+                        resultSet.getString("id_material"),
+                        resultSet.getDouble("coefficient")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<HistoHouseCompMat> getHistory(Connection connection) 
+        throws SQLException 
+    {
+        List<HistoHouseCompMat> historyList = new ArrayList<>();
+        String query = "SELECT * FROM histo_house_comp_mat WHERE id_house_composant_material = ? ORDER BY changed_at DESC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    historyList.add(new HistoHouseCompMat(
+                        resultSet.getString("id"),
+                        resultSet.getString("id_house_composant_material"),
+                        resultSet.getDouble("coefficient"),
+                        resultSet.getTimestamp("changed_at")
+                    ));
+                }
+            }
+        }
+        return historyList;
+    }
+
+    public double getCoefficientByPeriod(Connection connection, int month, int year) 
+        throws SQLException 
+    {
+        List<HistoHouseCompMat> history = getHistory(connection);
+
+        for (HistoHouseCompMat update : history) {
+            if (update.getChangedAt().toLocalDateTime().getYear() == year &&
+                update.getChangedAt().toLocalDateTime().getMonthValue() <= month) {
+                return update.getCoefficient();
+            }
+        }
+
+        return this.getCoefficient();
     }
 
     @Override
@@ -60,7 +145,7 @@ public class HouseComposantMaterial extends ClassMAPTable {
         this.idMaterial = idMaterial;
     }
 
-    public double calculateTotalCoefficient() {
+    public double getCoefficient() {
         return coefficient;
     }
 

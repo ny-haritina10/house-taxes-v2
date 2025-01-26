@@ -62,7 +62,7 @@ public class EditionController extends HttpServlet {
             { e.printStackTrace(); }
         }
 
-        else if ("pay".equals(action)) {
+        else if ("pay".equals(action)) { 
             String id = req.getParameter("id");
 
             try (Connection connection = Database.getConnection()) {

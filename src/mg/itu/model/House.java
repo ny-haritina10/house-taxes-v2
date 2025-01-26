@@ -38,13 +38,41 @@ public class House extends ClassMAPTable {
         this.longitude = longitude;
         this.latitude = latitude;
     }
+    
+    public HouseSituationPayment getHouseSituation(Connection connection, int year)
+        throws Exception 
+    {
+        List<Facture> yearlyFactures = getFactureByYear(connection, year);
+
+        double payedAmount = 0.00;  
+        double totalYearly = 0;
+
+        for (int i = 1; i < 13; i++) {
+            totalYearly += (Facture.getMonthlyAmountToPayByPeriod(connection, year, i, this));
+        }
+
+        for (Facture facture : yearlyFactures) {
+            if (facture.getIsPayed().equals("Y")) {
+                payedAmount += facture.getMonthlyMonthlyAmountToPay();
+            }
+        }
+
+        HouseSituationPayment situation = new HouseSituationPayment();
+        
+        situation.setHouse(this);
+        situation.setTotalPayed(payedAmount);
+        situation.setTotalUnpayed(totalYearly - payedAmount);
+        situation.setTotalToPay(totalYearly);
+
+        return situation;
+    }
 
     public void edition(Connection connection, int year, int month) 
         throws Exception
     {
         PricePerM2 price = calculatePricePerM2(connection, year, month);
         double surface = calculateTotalSurface(connection, month, year);
-        double coeff = calculateTotalCoeff(connection, year, month);
+        double coeff = calculateTotalCoefficientByPeriod(connection, year, month);
 
         Facture facture = new Facture(
             surface,
@@ -87,42 +115,18 @@ public class House extends ClassMAPTable {
         return houses;
     }
 
-    public double calculateTotalCoeff(Connection connection, int year, int month) 
-        throws Exception 
+    public double calculateTotalCoefficientByPeriod(Connection connection, int year, int month) 
+        throws SQLException 
     {
-        double totalCoefficient = 1.0; 
-    
-        String query = """
-            WITH house_total_coefficients AS (
-                SELECT 
-                    hc.id_house,
-                    EXP(SUM(LN(hcm.coefficient))) AS total_coefficient
-                FROM 
-                    house_caracteristique hc
-                JOIN house_composant_material hcm ON hc.id_house_composant_material = hcm.id
-                WHERE hc.id_house = ?
-                GROUP BY hc.id_house
-            )
-            SELECT COALESCE(htc.total_coefficient, 1.0) AS total_coefficient
-            FROM house_total_coefficients htc
-            RIGHT JOIN house h ON h.id = htc.id_house
-            WHERE h.id = ?
-        """;
-    
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, this.getId()); 
-            preparedStatement.setString(2, this.getId()); 
-    
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    totalCoefficient = resultSet.getDouble("total_coefficient");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error retrieving total coefficient.", e);
+        List<HouseComposantMaterial> materials = getHouseComposantMaterials(connection);
+
+        double totalCoefficient = 1.0;
+
+        for (HouseComposantMaterial material : materials) {
+            double coefficient = material.getCoefficientByPeriod(connection, month, year);
+            totalCoefficient *= coefficient;
         }
-    
+
         return totalCoefficient;
     }
 
@@ -158,7 +162,7 @@ public class House extends ClassMAPTable {
                     FROM house h 
                     WHERE h.id = ?
                     AND h.id_arrondissement = (
-                        SELECT MIN(a.id) -- Ensure only one row is returned
+                        SELECT MIN(a.id) 
                         FROM arrondissement a 
                         WHERE a.id_commune = tpc.id_commune
                     )
@@ -287,6 +291,33 @@ public class House extends ClassMAPTable {
         return totalSurface;
     }
 
+    private List<HouseComposantMaterial> getHouseComposantMaterials(Connection connection) throws SQLException {
+        List<HouseComposantMaterial> materials = new ArrayList<>();
+        String query = """
+            SELECT hcm.* 
+            FROM house_caracteristique hc
+            JOIN house_composant_material hcm ON hc.id_house_composant_material = hcm.id
+            WHERE hc.id_house = ?
+        """;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    HouseComposantMaterial material = new HouseComposantMaterial(
+                        resultSet.getString("id"),
+                        resultSet.getString("id_house_composant"),
+                        resultSet.getString("id_material"),
+                        resultSet.getDouble("coefficient")
+                    );
+                    materials.add(material);
+                }
+            }
+        }
+
+        return materials;
+    }
+
     public Commune getCommune(Connection connection) {
         Commune commune = null;
         String query = "SELECT commune_id, commune_label FROM house_commune_view WHERE house_id = ?";
@@ -310,30 +341,28 @@ public class House extends ClassMAPTable {
         return commune;
     }
 
-    public List<Facture> getFactureByMonthYear(Connection connection, int year, int month) {
+    public List<Facture> getFactureByYear(Connection connection, int year) {
         List<Facture> factures = new ArrayList<>();
-        String query = "SELECT * FROM house_invoice_simple WHERE house_id = ? AND year = ? AND month = ?";
+        String query = "SELECT * FROM facture WHERE ID_HOUSE = ? AND YEAR = ?";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, this.getId()); 
             preparedStatement.setInt(2, year); 
-            preparedStatement.setInt(3, month); 
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     Facture facture = new Facture(
-                        resultSet.getString("facture_id"),
-                        resultSet.getDouble("total_surface"),
+                        resultSet.getString("id"),
+                        resultSet.getDouble("totalSurface"),
                         resultSet.getInt("year"),
                         resultSet.getInt("month"),
                         resultSet.getDouble("unit_price"),
                         resultSet.getDouble("coefficient"),
-                        resultSet.getString("house_id"),
+                        resultSet.getString("id_house"),
                         resultSet.getDouble("monthly_amount_to_pay"),
-                        resultSet.getString("isPayed"),
+                        resultSet.getString("is_payed"),
                         resultSet.getDate("date_payment_facture")
                     );
-
                     factures.add(facture);
                 }
             }
