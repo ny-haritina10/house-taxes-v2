@@ -130,165 +130,176 @@ public class House extends ClassMAPTable {
         return totalCoefficient;
     }
 
-    public PricePerM2 calculatePricePerM2(Connection connection, int year, int month) throws Exception {
-        double amount = 0.0;
-        Date datePrice = null;
-    
-        String query = """
-            WITH relevant_history AS (
-                SELECT amount_per_m2, changed_at,
-                       ROW_NUMBER() OVER (PARTITION BY id_commune ORDER BY changed_at DESC) AS rn
-                FROM histo_taxe_per_commune htc
-                WHERE id_commune = ?
-                AND changed_at <= TO_DATE(?, 'YYYY-MM-DD')
-                AND EXISTS (
-                    SELECT 1 
-                    FROM house h 
-                    WHERE h.id = ?
-                    AND h.id_arrondissement = (
-                        SELECT MIN(a.id) -- Ensure only one row is returned
-                        FROM arrondissement a 
-                        WHERE a.id_commune = htc.id_commune
-                    )
-                )
-            ),
-            fallback_to_taxe AS (
-                SELECT amount_per_m2, date_taxe,
-                       ROW_NUMBER() OVER (PARTITION BY id_commune ORDER BY amount_per_m2 DESC) AS rn
-                FROM taxe_per_commune tpc
-                WHERE tpc.id_commune = ?
-                AND EXISTS (
-                    SELECT 1 
-                    FROM house h 
-                    WHERE h.id = ?
-                    AND h.id_arrondissement = (
-                        SELECT MIN(a.id) 
-                        FROM arrondissement a 
-                        WHERE a.id_commune = tpc.id_commune
-                    )
-                )
-                AND NOT EXISTS (
-                    SELECT 1 
-                    FROM histo_taxe_per_commune htc 
-                    WHERE htc.id_commune = tpc.id_commune
-                )
-            )
-            SELECT COALESCE(
-                (SELECT amount_per_m2 
-                 FROM relevant_history 
-                 WHERE rn = 1),
-                (SELECT amount_per_m2 
-                 FROM fallback_to_taxe 
-                 WHERE rn = 1),
-                0
-            ) AS amount,
-            COALESCE(
-                (SELECT changed_at 
-                 FROM relevant_history 
-                 WHERE rn = 1),
-                (SELECT date_taxe 
-                 FROM fallback_to_taxe 
-                 WHERE rn = 1),
-                TO_DATE(?, 'YYYY-MM-DD') 
-            ) AS date_price
-            FROM dual                                                          
-        """;
-    
+    public PricePerM2 calculatePricePerM2(Connection connection, int year, int month) 
+        throws Exception 
+    {
         Arrondissement arrondissement = (Arrondissement) new Arrondissement().getById(this.getIdArrondissement(), "arrondissement", connection);
         Commune commune = (Commune) new Commune().getById(arrondissement.getIdCommune(), "commune", connection);
     
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            String targetDate = String.format("%04d-%02d-27", year, month); 
-
-            preparedStatement.setString(1, commune.getId());
-            preparedStatement.setString(2, targetDate); 
-            preparedStatement.setString(3, this.getId()); 
-            preparedStatement.setString(4, commune.getId()); 
-            preparedStatement.setString(5, this.getId()); 
-            preparedStatement.setString(6, targetDate); 
+        Double amount = getMostRecentPricePerM2FromHistory(connection, commune.getId(), year, month);
     
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    amount = resultSet.getDouble("amount");
-                    datePrice = resultSet.getDate("date_price");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error retrieving price per m2.", e);
+        if (amount == null || amount == 0) {
+            amount = getFallbackPricePerM2(connection, commune.getId());
         }
     
-        if (amount == 0) {
-            String sql = "SELECT amount_per_m2, date_taxe FROM taxe_per_commune WHERE id_commune = ?";
-            try (PreparedStatement fallbackStatement = connection.prepareStatement(sql)) {
-                fallbackStatement.setString(1, commune.getId());
-                try (ResultSet fallbackResultSet = fallbackStatement.executeQuery()) {
-                    if (fallbackResultSet.next()) {
-                        amount = fallbackResultSet.getDouble("amount_per_m2");
-                        datePrice = fallbackResultSet.getDate("date_taxe");
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Error retrieving fallback price per m2.", e);
-            }
+        Date datePrice = getPriceDate(connection, commune.getId(), year, month);
+    
+        if (datePrice == null) {
+            String targetDate = String.format("%04d-%02d-27", year, month);
+            datePrice = Date.valueOf(targetDate);
         }
     
         return new PricePerM2(amount, datePrice);
     }
-
-    public double calculateTotalSurface(Connection connection, int month, int year) {
-        double totalSurface = 0.0;
-
+    
+    public double calculateTotalSurface(Connection connection, int month, int year) 
+        throws SQLException 
+    {
+        double[] dimensions = getMostRecentDimensionsFromHistory(connection, year, month);
+    
+        if (dimensions == null) {
+            dimensions = getFallbackDimensions(connection);
+        }
+    
+        double width = dimensions[0];
+        double height = dimensions[1];
+        return width * height;
+    }
+    
+    private double[] getMostRecentDimensionsFromHistory(Connection connection, int year, int month) throws SQLException {
         String query = """
-            WITH relevant_history AS (
-                SELECT width, height, changed_at
-                FROM histo_house hh
-                WHERE id_house = ?
-                AND changed_at <= TO_DATE(?, 'YYYY-MM-DD') 
-                ORDER BY changed_at DESC
-            ),
-            limited_history AS (
-                SELECT width, height
-                FROM (
-                    SELECT width, height, ROW_NUMBER() OVER (ORDER BY changed_at DESC) AS rn
-                    FROM relevant_history
-                )
-                WHERE rn = 1  
-            ),
-            fallback_to_house AS (
-                SELECT width, height
-                FROM house h
-                WHERE h.id = ?
-                AND NOT EXISTS (
-                    SELECT 1 FROM histo_house hh WHERE hh.id_house = h.id
-                )
-            )
-            SELECT SUM(width * height) AS total_surface
+            SELECT width, height
             FROM (
-                SELECT width, height FROM limited_history
-                UNION ALL
-                SELECT width, height FROM fallback_to_house
+                SELECT width, height, changed_at
+                FROM histo_house
+                WHERE id_house = ?
+                AND changed_at <= TO_DATE(?, 'YYYY-MM-DD')
+                ORDER BY changed_at DESC
             )
+            WHERE ROWNUM = 1
         """;
-
+    
+        String targetDate = String.format("%04d-%02d-27", year, month);
+    
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, this.getId()); 
-            String targetDate = String.format("%04d-%02d-27", year, month); 
-            preparedStatement.setString(2, targetDate); 
-            preparedStatement.setString(3, this.getId()); 
-
+            preparedStatement.setString(1, this.getId());
+            preparedStatement.setString(2, targetDate);
+    
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    totalSurface = resultSet.getDouble("total_surface");
+                    double width = resultSet.getDouble("width");
+                    double height = resultSet.getDouble("height");
+                    return new double[] { width, height };
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error calculating total surface area.", e);
         }
+    
+        return null;
+    }
+    
+    private double[] getFallbackDimensions(Connection connection) throws SQLException {
+        String query = "SELECT width, height FROM house WHERE id = ?";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.getId());
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    double width = resultSet.getDouble("width");
+                    double height = resultSet.getDouble("height");
+                    return new double[] { width, height };
+                }
+            }
+        }
+    
+        throw new SQLException("No dimensions found for house with ID: " + this.getId());
+    }
 
-        return totalSurface;
+    private Double getMostRecentPricePerM2FromHistory(Connection connection, String communeId, int year, int month) 
+        throws SQLException 
+    {
+        String query = """
+            SELECT amount_per_m2, changed_at
+            FROM (
+                SELECT amount_per_m2, changed_at
+                FROM histo_taxe_per_commune
+                WHERE id_commune = ?
+                AND changed_at <= TO_DATE(?, 'YYYY-MM-DD')
+                ORDER BY changed_at DESC
+            )
+            WHERE ROWNUM = 1
+        """;
+    
+        String targetDate = String.format("%04d-%02d-27", year, month);
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, communeId);
+            preparedStatement.setString(2, targetDate);
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("amount_per_m2");
+                }
+            }
+        }
+    
+        return null;
+    }
+    
+    private Double getFallbackPricePerM2(Connection connection, String communeId) throws SQLException {
+        String query = "SELECT amount_per_m2 FROM taxe_per_commune WHERE id_commune = ?";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, communeId);
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("amount_per_m2");
+                }
+            }
+        }
+    
+        return 0.0;
+    }
+    
+    private Date getPriceDate(Connection connection, String communeId, int year, int month) throws SQLException {
+        String query = """
+            SELECT changed_at
+            FROM (
+                SELECT changed_at
+                FROM histo_taxe_per_commune
+                WHERE id_commune = ?
+                AND changed_at <= TO_DATE(?, 'YYYY-MM-DD')
+                ORDER BY changed_at DESC
+            )
+            WHERE ROWNUM = 1
+        """;
+    
+        String targetDate = String.format("%04d-%02d-27", year, month);
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, communeId);
+            preparedStatement.setString(2, targetDate);
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDate("changed_at");
+                }
+            }
+        }
+    
+        String fallbackQuery = "SELECT date_taxe FROM taxe_per_commune WHERE id_commune = ?";
+        try (PreparedStatement fallbackStatement = connection.prepareStatement(fallbackQuery)) {
+            fallbackStatement.setString(1, communeId);
+    
+            try (ResultSet fallbackResultSet = fallbackStatement.executeQuery()) {
+                if (fallbackResultSet.next()) {
+                    return fallbackResultSet.getDate("date_taxe");
+                }
+            }
+        }
+    
+        return null;
     }
 
     private List<HouseComposantMaterial> getHouseComposantMaterials(Connection connection) throws SQLException {

@@ -30,7 +30,7 @@
                       <label for="year">Year: </label>
                     </th>
                     <td>
-                      <input type="number" class="form-control" id="year" name="year" min="2000" max="2100" required>
+                      <input type="number" class="form-control" id="year" name="year" min="2000" max="2100" value="2025" required>
                     </td>
                   </tr>
                   <!-- Month Select -->
