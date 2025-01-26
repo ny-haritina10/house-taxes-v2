@@ -31,15 +31,15 @@
                 } 
             %>
 
-            <form action="TraitementUser" method="post" style="width: 100%; max-width: 300px;">
+            <form action="LoginController" method="post" style="width: 100%; max-width: 300px;">
                 <input type="hidden" name="action" value="login"/>
                 <div class="input-group" style="margin-bottom: 10px;">
                     <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="Nom d'utilisateur" required/>
+                    <input type="text" value="user" name="username" class="form-control" placeholder="Nom d'utilisateur" required/>
                 </div>
                 <div class="input-group" style="margin-bottom: 10px;">
                     <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                    <input type="password" name="password" class="form-control" placeholder="Mot de passe" required/>
+                    <input type="password" value="user" name="password" class="form-control" placeholder="Mot de passe" required/>
                 </div>
                 <div class="row">
                     <div class="col-xs-5">

@@ -216,4 +216,4 @@ UPDATE house SET id_house_owner = 12 WHERE id = 12;
 /*================================================================== */
 /*================================================================== */
 /*================================================================== */
-INSERT INTO users (id, id_commune, user_name, user_password) VALUES (1, 1, 'proprio 1', 'proprio1');
+INSERT INTO users (id, id_commune, user_name, user_password) VALUES (1, 1, 'user', 'user');

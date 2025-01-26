@@ -28,7 +28,8 @@
           </a>
 
           <ul class="treeview-menu">
-              <li><a href="SituationPaymentController"><i class="fa fa-plus"></i>House payment situation</a></li>
+              <li><a href="SituationPaymentController"><i class="fa fa-plus"></i>Houses</a></li>
+              <li><a href="ArrondissementSituationController"><i class="fa fa-plus"></i>Arrondissements</a></li>
           </ul>
         </li>
       </div>

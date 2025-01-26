@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import mg.itu.database.Database;
-import mg.itu.model.House;
-import mg.itu.model.HouseSituationPayment;
+import mg.itu.model.Arrondissement;
+import mg.itu.model.ArrondissementSituationPayment;
 
-@WebServlet("controller/SituationPaymentController")
-public class SituationPaymentController extends HttpServlet {
+@WebServlet("controller/ArrondissementSituationController")
+public class ArrondissementSituationController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
@@ -28,28 +28,28 @@ public class SituationPaymentController extends HttpServlet {
             try (Connection connection = Database.getConnection()) {
                 int year = Integer.parseInt(req.getParameter("year"));
 
-                List<House> houses = House.getAll(connection);
-                List<HouseSituationPayment> situations = new ArrayList<>();
+                List<Arrondissement> arrondissements = Arrondissement.getAll(connection);
+                List<ArrondissementSituationPayment> situations = new ArrayList<>();
                 
-                for (House house : houses) {
-                    HouseSituationPayment situation = house.getHouseSituation(connection, year);
+                for (Arrondissement arrondissement : arrondissements) {
+                    ArrondissementSituationPayment situation = arrondissement.getTotalArrondissementSituation(connection, year);
                     situations.add(situation);
                 }
 
                 req.setAttribute("situations", situations);
                 req.setAttribute("year", year);
 
-                req.getRequestDispatcher("/WEB-INF/views/situation/situation-house.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/views/situation/situation-arrondissement.jsp").forward(req, resp);
             } 
             
             catch (Exception e) {
                 e.printStackTrace();
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving payment situations.");
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving arrondissement situations.");
             }
         } 
-
+        
         else {
-            req.getRequestDispatcher("/WEB-INF/views/situation/situation-house.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/situation/situation-arrondissement.jsp").forward(req, resp);
         }
     }
 
