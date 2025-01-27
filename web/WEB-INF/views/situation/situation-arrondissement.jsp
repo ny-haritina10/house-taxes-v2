@@ -3,12 +3,23 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Comparator" %>
 
 <%
     List<ArrondissementSituationPayment> situations = (List<ArrondissementSituationPayment>) request.getAttribute("situations");
     List<Arrondissement> arrondissements = (List<Arrondissement>) request.getAttribute("arrondissements");
     Integer year = (Integer) request.getAttribute("year");
     NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.FRANCE);
+
+    // Sort the situations list by Total Unpaid in descending order
+    if (situations != null && !situations.isEmpty()) {
+        Collections.sort(situations, new Comparator<ArrondissementSituationPayment>() {
+            public int compare(ArrondissementSituationPayment s1, ArrondissementSituationPayment s2) {
+                return Double.compare(s2.getTotalUnpayed(), s1.getTotalUnpayed()); // Descending order
+            }
+        });
+    }
 %>
 
 <%@ include file="../../templates/header.jsp" %>
@@ -77,9 +88,11 @@
                       <tbody>
                           <%
                               if (situations != null && !situations.isEmpty()) {
+                                  int rowCount = 0;
                                   for (ArrondissementSituationPayment situation : situations) {
+                                      rowCount++;
                           %>
-                                      <tr>
+                                      <tr <%= rowCount == 1 ? "style='background-color: yellow;'" : "" %>>
                                           <td>ARR-00<%= situation.getArrondissement().getId() %></td>
                                           <td><%= situation.getArrondissement().getLabel() %></td>
                                           <td><%= currencyFormatter.format(situation.getTotalToPay()) %></td>

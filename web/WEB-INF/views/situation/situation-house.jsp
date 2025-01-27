@@ -4,12 +4,34 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%
     List<HouseSituationPayment> situations = (List<HouseSituationPayment>) request.getAttribute("situations");
     List<House> houses = (List<House>) request.getAttribute("houses");
     Integer year = (Integer) request.getAttribute("year");
     NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.FRANCE);
+
+    // Filter out situations where Total Paid is 0
+    List<HouseSituationPayment> filteredSituations = new ArrayList<>();
+    if (situations != null && !situations.isEmpty()) {
+        for (HouseSituationPayment situation : situations) {
+            if (situation.getTotalPayed() > 0) {
+                filteredSituations.add(situation);
+            }
+        }
+    }
+
+    // Sort the filtered situations by Total Unpaid in descending order
+    if (!filteredSituations.isEmpty()) {
+        Collections.sort(filteredSituations, new Comparator<HouseSituationPayment>() {
+            public int compare(HouseSituationPayment s1, HouseSituationPayment s2) {
+                return Double.compare(s2.getTotalUnpayed(), s1.getTotalUnpayed()); // Descending order
+            }
+        });
+    }
 %>
 
 <%@ include file="../../templates/header.jsp" %>
@@ -77,10 +99,12 @@
                           </thead>
                           <tbody>
                               <%
-                                  if (situations != null && !situations.isEmpty()) {
-                                      for (HouseSituationPayment situation : situations) {
+                                  if (!filteredSituations.isEmpty()) {
+                                      int rowCount = 0;
+                                      for (HouseSituationPayment situation : filteredSituations) {
+                                          rowCount++;
                               %>
-                                      <tr>
+                                      <tr <%= rowCount == 1 ? "style='background-color: yellow;'" : "" %>>
                                           <td>HOUS-00<%= situation.getHouse().getId() %></td>
                                           <td><%= situation.getHouse().getLabel() %></td>
                                           <td><%= currencyFormatter.format(situation.getTotalToPay()) %></td>

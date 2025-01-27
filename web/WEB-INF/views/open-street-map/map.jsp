@@ -62,7 +62,7 @@
 
               (function(idArrondissement) {
                   polygon.on('click', function() {
-                      console.log("Clicked Arrondissement ID:", idArrondissement); // Debugging
+                      console.log("Clicked Arrondissement ID:", idArrondissement); 
                       window.location.href = "http://localhost:8080/house-taxes-v2/controller/ArrondissementSituationController?action=view&year=2024&arrondissement=" + idArrondissement;
                   });
               })(idArrondissement); 
