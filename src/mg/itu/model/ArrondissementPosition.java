@@ -8,9 +8,10 @@ public class ArrondissementPosition extends ClassMAPTable {
     String idArrondissement;
     double longitude;
     double latitude;
+    String table = "arrondissement_position";
 
     public ArrondissementPosition() {
-        super.setNomTable("arrondissement_position");
+        super.setNomTable(table);
     }
 
     public ArrondissementPosition(String id, String idArrondissement, double longitude, double latitude) {
@@ -66,5 +67,13 @@ public class ArrondissementPosition extends ClassMAPTable {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
     }
 }

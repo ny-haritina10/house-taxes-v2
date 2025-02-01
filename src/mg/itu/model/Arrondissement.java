@@ -14,9 +14,10 @@ public class Arrondissement extends ClassMAPTable {
     String id;
     String idCommune;
     String label;
+    String table = "arrondissement";
 
     public Arrondissement() {
-        super.setNomTable("arrondissement");
+        super.setNomTable(table);
     }
 
     public Arrondissement(String id, String idCommune, String label) {
@@ -184,5 +185,13 @@ public class Arrondissement extends ClassMAPTable {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
     }
 }

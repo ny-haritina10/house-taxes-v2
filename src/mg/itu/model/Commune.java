@@ -6,9 +6,10 @@ public class Commune extends ClassMAPTable {
 
     String id;
     String label;
+    String table = "commune";
 
     public Commune() {
-        super.setNomTable("commune");
+        super.setNomTable(table);
     }
 
     public Commune(String id, String label) {
@@ -41,4 +42,12 @@ public class Commune extends ClassMAPTable {
 
     public void setLabel(String label) 
     { this.label = label; }
+
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
+    }   
 }
